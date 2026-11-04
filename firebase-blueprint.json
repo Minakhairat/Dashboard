@@ -1,0 +1,130 @@
+{
+  "entities": {
+    "AppSetting": {
+      "title": "AppSetting",
+      "description": "General system configuration including dashboard PIN and admin emails",
+      "type": "object",
+      "properties": {
+        "dashboardPin": { "type": "string", "maxLength": 32 },
+        "factoryName": { "type": "string", "maxLength": 100 },
+        "adminEmails": { "type": "array" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["dashboardPin", "factoryName"]
+    },
+    "Supervisor": {
+      "title": "Supervisor",
+      "description": "Authorized supervisors allowed to enter reports",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "assignedLines": { "type": "array" },
+        "active": { "type": "boolean" },
+        "role": { "type": "string", "enum": ["supervisor", "admin"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["email", "name", "role", "active"]
+    },
+    "ProductionLine": {
+      "title": "ProductionLine",
+      "description": "Production lines with cycle times and KPI targets",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "code": { "type": "string", "maxLength": 50 },
+        "category": { "type": "string", "maxLength": 50 },
+        "idealCycleTimeSeconds": { "type": "number" },
+        "targetHourlyUnits": { "type": "number" },
+        "targetShiftUnits": { "type": "number" },
+        "targetOEE": { "type": "number" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["name", "code", "idealCycleTimeSeconds", "targetHourlyUnits"]
+    },
+    "HourlyReport": {
+      "title": "HourlyReport",
+      "description": "Hour-by-hour assembly line production and rework logs",
+      "type": "object",
+      "properties": {
+        "lineId": { "type": "string", "maxLength": 64 },
+        "lineName": { "type": "string", "maxLength": 100 },
+        "date": { "type": "string", "maxLength": 20 },
+        "shift": { "type": "string", "maxLength": 20 },
+        "timeSlot": { "type": "string", "maxLength": 30 },
+        "model": { "type": "string", "maxLength": 100 },
+        "modelCode": { "type": "string", "maxLength": 50 },
+        "plannedQty": { "type": "number" },
+        "actualQty": { "type": "number" },
+        "downtimeMinutes": { "type": "number" },
+        "downtimeReason": { "type": "string", "maxLength": 500 },
+        "plannedWorkers": { "type": "number" },
+        "actualWorkers": { "type": "number" },
+        "plannedTimeMinutes": { "type": "number" },
+        "operatingTimeMinutes": { "type": "number" },
+        "defects": { "type": "object" },
+        "totalDefects": { "type": "number" },
+        "reworkPercentage": { "type": "number" },
+        "supervisorName": { "type": "string", "maxLength": 100 },
+        "supervisorEmail": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["lineId", "date", "shift", "timeSlot", "actualQty"]
+    },
+    "DailyReport": {
+      "title": "DailyReport",
+      "description": "Daily productivity follow-up report QF-08.01.03",
+      "type": "object",
+      "properties": {
+        "lineId": { "type": "string", "maxLength": 64 },
+        "lineName": { "type": "string", "maxLength": 100 },
+        "date": { "type": "string", "maxLength": 20 },
+        "plannedWorkers": { "type": "number" },
+        "actualWorkers": { "type": "number" },
+        "plannedHours": { "type": "number" },
+        "actualHours": { "type": "number" },
+        "lineAbsenteeism": { "type": "number" },
+        "outgoingWorkers": { "type": "number" },
+        "productionRows": { "type": "array" },
+        "incomingDeviations": { "type": "array" },
+        "outgoingDeviations": { "type": "array" },
+        "downtimes": { "type": "array" },
+        "totalPlannedQty": { "type": "number" },
+        "totalActualQty": { "type": "number" },
+        "kpiAvailability": { "type": "number" },
+        "kpiPerformance": { "type": "number" },
+        "kpiQuality": { "type": "number" },
+        "kpiOEE": { "type": "number" },
+        "kpiRejection": { "type": "number" },
+        "kpiAchievement": { "type": "number" },
+        "supervisorName": { "type": "string", "maxLength": 100 },
+        "supervisorEmail": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["lineId", "date", "totalActualQty"]
+    }
+  },
+  "firestore": {
+    "/app_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/AppSetting" },
+      "description": "System settings such as PIN and defaults"
+    },
+    "/supervisors/{supervisorId}": {
+      "schema": { "$ref": "#/entities/Supervisor" },
+      "description": "Authorized supervisor email records"
+    },
+    "/production_lines/{lineId}": {
+      "schema": { "$ref": "#/entities/ProductionLine" },
+      "description": "Configured factory production lines"
+    },
+    "/hourly_reports/{reportId}": {
+      "schema": { "$ref": "#/entities/HourlyReport" },
+      "description": "Real-time hour by hour assembly logs"
+    },
+    "/daily_reports/{reportId}": {
+      "schema": { "$ref": "#/entities/DailyReport" },
+      "description": "Daily official production follow-up sheets"
+    }
+  }
+}

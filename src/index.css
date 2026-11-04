@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .dir-ltr {
+    direction: ltr;
+  }
+  .dir-rtl {
+    direction: rtl;
+  }
+}
+
+/* Custom scrollbars for industrial display */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* TV / Fullscreen Wall Display Mode */
+.tv-mode {
+  font-size: 1.05rem;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+}

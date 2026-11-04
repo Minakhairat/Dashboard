@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // App settings (dashboard PIN, factory config)
+    match /app_settings/{settingId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Authorized supervisors list
+    match /supervisors/{supervisorId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Production lines
+    match /production_lines/{lineId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Hourly production reports (hour-by-hour)
+    match /hourly_reports/{reportId} {
+      allow read: if true;
+      allow create, update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
+
+    // Daily productivity reports (QF-08.01.03)
+    match /daily_reports/{reportId} {
+      allow read: if true;
+      allow create, update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
+  }
+}

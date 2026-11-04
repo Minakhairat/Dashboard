@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <!-- Background rounded box -->
+  <rect width="64" height="64" rx="16" fill="url(#bg)" stroke="#334155" stroke-width="2" />
+  
+  <!-- Outer gauge ring -->
+  <circle cx="32" cy="32" r="23" fill="none" stroke="#1e293b" stroke-width="5" />
+  <circle cx="32" cy="32" r="23" fill="none" stroke="url(#glow)" stroke-width="5" stroke-dasharray="100 45" stroke-linecap="round" transform="rotate(-135 32 32)" />
+  
+  <!-- Center pulse heartbeat / KPI line -->
+  <path d="M17 34 L25 34 L28 23 L34 43 L38 31 L41 34 L47 34" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Active live green dot -->
+  <circle cx="48" cy="18" r="4" fill="#10b981" />
+  <circle cx="48" cy="18" r="7" fill="none" stroke="#10b981" stroke-width="1.5" opacity="0.6" />
+</svg>

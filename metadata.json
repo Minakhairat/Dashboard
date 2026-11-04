@@ -1,0 +1,6 @@
+{
+  "name": "منظومة تقارير وداشبورد الإنتاج الذكية",
+  "description": "نظام إدارة ومتابعة الإنتاج اليومي وحساب مؤشرات الأداء KPIs وتقارير ساعة بساعة لحظيا لخطوط الإنتاج - م/ مينا خيرت",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
