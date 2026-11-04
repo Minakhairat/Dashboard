@@ -84,6 +84,7 @@ export default function App() {
     getOrInitSettings().then((settings) => {
       setAppSettings(settings);
     });
+    seedInitialDataIfNeeded();
   }, []);
 
   // 2. Real-time subscriptions to Firestore collections

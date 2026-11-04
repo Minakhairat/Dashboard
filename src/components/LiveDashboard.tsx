@@ -28,7 +28,7 @@ import {
   STANDARD_HOURLY_SLOTS,
 } from '../types';
 import { calculateKPIs, getStatusBadge } from '../utils/kpiCalculator';
-import { saveHourlyReport } from '../services/dbService';
+import { saveHourlyReport, INITIAL_PRODUCTION_LINES } from '../services/dbService';
 import { SpeedometerGauge } from './SpeedometerGauge';
 import confetti from 'canvas-confetti';
 import {
@@ -80,6 +80,7 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
   const [lastUpdateTime, setLastUpdateTime] = useState<string>('متصل بالخادم');
   const [justUpdated, setJustUpdated] = useState<boolean>(false);
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
+  const [simulationToast, setSimulationToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [chartViewMode, setChartViewMode] = useState<'cumulative' | 'oee_bars'>('oee_bars');
 
   // Monitor real-time Firestore updates and animate changes
@@ -103,9 +104,9 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
   // Test Live Update simulation
   const simulateLiveUpdate = async () => {
     setIsSimulating(true);
+    setSimulationToast(null);
     try {
-      const targetLine = lines.find((l) => l.id === selectedLineId) || lines[0];
-      if (!targetLine) return;
+      const targetLine = lines.find((l) => l.id === selectedLineId) || lines[0] || INITIAL_PRODUCTION_LINES[0];
       const today = selectedDate || new Date().toISOString().split('T')[0];
 
       const existingSlotIds = new Set(
@@ -129,7 +130,7 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
         plannedQty: targetLine.targetHourlyUnits,
         actualQty,
         downtimeMinutes: Math.random() > 0.7 ? 12 : 0,
-        downtimeReason: Math.random() > 0.7 ? 'ضبط حساسات التجميع وميزان الشفرات' : '',
+        downtimeReason: Math.random() > 0.7 ? 'ضبط وتزامن شفرات وميكانيزم التجميع' : '',
         plannedWorkers: 24,
         actualWorkers: 24,
         plannedTimeMinutes: nextSlot.minutes,
@@ -140,8 +141,20 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
         supervisorName: 'محاكاة التحديث اللحظي',
         supervisorEmail: 'live-test@fresh.com',
       });
-    } catch (err) {
+
+      setSimulationToast({
+        type: 'success',
+        message: `⚡ تم إرسال وتحديث ساعة إنتاج جديدة بنجاح (${nextSlot.label}) لـ ${targetLine.name}، وتحديث مؤشرات KPIs لحظياً!`,
+      });
+      setTimeout(() => setSimulationToast(null), 5000);
+    } catch (err: unknown) {
       console.error('Simulation error:', err);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setSimulationToast({
+        type: 'error',
+        message: `تعذر التحديث: ${errMsg}`,
+      });
+      setTimeout(() => setSimulationToast(null), 8000);
     } finally {
       setIsSimulating(false);
     }
@@ -359,11 +372,11 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
           <button
             onClick={simulateLiveUpdate}
             disabled={isSimulating}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 rounded-lg text-xs font-bold transition"
+            className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/50 text-amber-300 rounded-lg text-xs font-bold transition shadow-sm active:scale-95"
             title="إرسال دفعة إنتاج تجريبية لتأكيد التحديث المباشر للمؤشرات"
           >
             <Zap className={`w-3.5 h-3.5 text-amber-400 ${isSimulating ? 'animate-spin' : ''}`} />
-            <span>تحديث لحظي</span>
+            <span>{isSimulating ? 'جاري التحديث...' : 'تحديث لحظي'}</span>
           </button>
 
           {/* Print buttons */}
@@ -386,8 +399,34 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
         </div>
       </div>
 
+      {/* Simulation Feedback Toast */}
+      {simulationToast && (
+        <div
+          className={`p-3 rounded-xl text-xs font-bold flex items-center justify-between shadow-xl transition-all duration-300 ${
+            simulationToast.type === 'success'
+              ? 'bg-emerald-950/90 border border-emerald-500 text-emerald-200 shadow-emerald-500/10'
+              : 'bg-rose-950/90 border border-rose-500 text-rose-200 shadow-rose-500/10'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {simulationToast.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            )}
+            <span>{simulationToast.message}</span>
+          </div>
+          <button
+            onClick={() => setSimulationToast(null)}
+            className="text-slate-400 hover:text-white transition p-1"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Real-time Alert Toast when Firestore changes */}
-      {justUpdated && (
+      {justUpdated && !simulationToast && (
         <div className="p-2.5 bg-emerald-950/80 border border-emerald-500/50 rounded-xl text-emerald-300 text-xs font-bold flex items-center justify-between shadow-lg">
           <div className="flex items-center gap-2">
             <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />

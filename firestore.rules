@@ -2,11 +2,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
     // Default deny catch-all
     match /{document=**} {
       allow read, write: if false;
@@ -14,34 +9,27 @@ service cloud.firestore {
 
     // App settings (dashboard PIN, factory config)
     match /app_settings/{settingId} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow read, write: if true;
     }
 
     // Authorized supervisors list
     match /supervisors/{supervisorId} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow read, write: if true;
     }
 
     // Production lines
     match /production_lines/{lineId} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow read, write: if true;
     }
 
     // Hourly production reports (hour-by-hour)
     match /hourly_reports/{reportId} {
-      allow read: if true;
-      allow create, update: if isSignedIn();
-      allow delete: if isSignedIn();
+      allow read, write: if true;
     }
 
     // Daily productivity reports (QF-08.01.03)
     match /daily_reports/{reportId} {
-      allow read: if true;
-      allow create, update: if isSignedIn();
-      allow delete: if isSignedIn();
+      allow read, write: if true;
     }
   }
 }

@@ -137,9 +137,6 @@ export async function updateSettings(settings: Partial<AppSettings>): Promise<vo
  * Seed initial production lines and default supervisor if empty (requires auth)
  */
 export async function seedInitialDataIfNeeded(currentUserEmail?: string | null): Promise<void> {
-  if (!auth.currentUser) {
-    return;
-  }
   try {
     const linesSnap = await getDocs(collection(db, 'production_lines'));
     if (linesSnap.empty) {
